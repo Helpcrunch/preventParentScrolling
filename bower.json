@@ -1,0 +1,17 @@
+{
+  "name": "prevent-parent-scrolling",
+  "main": "preventParentScrolling.js",
+  "authors": [
+    "Viktoriia Lysenko <lysenko@seranking.com>"
+  ],
+  "description": "prevent-parent-scrolling",
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
