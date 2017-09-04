@@ -4,7 +4,11 @@
 function preventParentScrolling (element) {
   var isMacWebkit = ((navigator.userAgent.indexOf("Macintosh") !== -1) &&
   (navigator.userAgent.indexOf("WebKit") !== -1));
-  var isFirefox = (navigator.userAgent.indexOf("firefox") !== -1);
+
+  var isWinWebkit = ((navigator.userAgent.indexOf("Windows") !== -1) &&
+  (navigator.userAgent.indexOf("WebKit") !== -1));
+
+  var isFirefox = (navigator.userAgent.indexOf("Firefox") !== -1);
 
   // Register mousewheel event handlers.
   element.onwheel = wheelHandler;       // Future browsers
@@ -13,6 +17,7 @@ function preventParentScrolling (element) {
     element.scrollTop = 0;
     element.addEventListener("DOMMouseScroll", wheelHandler, false);
   }
+
   // prevent from scrolling parrent elements
   function wheelHandler(event) {
     var e = event || window.event;  // Standard or IE event object
@@ -24,15 +29,27 @@ function preventParentScrolling (element) {
     // If future browsers fire both "wheel" and "mousewheel" for the same
     // event, we'll end up double-counting it here. Hopefully, however,
     // cancelling the wheel event will prevent generation of mousewheel.
-    var deltaX = e.deltaX * -30 ||  // wheel event
-      e.wheelDeltaX / 4 ||  // mousewheel
-      0;    // property not defined
-    var deltaY = e.deltaY * -30 ||  // wheel event
-      e.wheelDeltaY / 4 ||  // mousewheel event in Webkit
-      (e.wheelDeltaY === undefined &&      // if there is no 2D property then
-      e.wheelDelta / 4) ||  // use the 1D wheel property
-      e.detail * -10 ||  // Firefox DOMMouseScroll event
-      0;     // property not defined
+    var deltaX = 0;
+    var deltaY = 0;
+
+    if (isFirefox) {
+      deltaX = e.deltaX * -10;
+      deltaY = e.deltaY * -10;
+    } else if (isWinWebkit) {
+      deltaX = e.deltaX * -1;
+      deltaY = e.deltaY * -1;
+    } else {
+      deltaX = e.deltaX * -30 ||  // wheel event
+        e.wheelDeltaX / 4 ||  // mousewheel
+        0;    // property not defined
+
+      deltaY = e.deltaY * -30 || // mousewheel event in Webkit
+        e.wheelDeltaY / 4 ||
+        (e.wheelDeltaY === undefined &&      // if there is no 2D property then
+        e.wheelDelta / 4) ||  // use the 1D wheel property
+        e.detail * -10 ||  // Firefox DOMMouseScroll event
+        0;     // property not defined
+    }
 
     // Most browsers generate one event with delta 120 per mousewheel click.
     // On Macs, however, the mousewheels seem to be velocity-sensitive and
@@ -42,6 +59,7 @@ function preventParentScrolling (element) {
       deltaX /= 30;
       deltaY /= 30;
     }
+
     e.currentTarget.scrollTop -= deltaY;
     // If we ever get a mousewheel or wheel event in (a future version of)
     // Firefox, then we don't need DOMMouseScroll anymore.
